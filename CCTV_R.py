@@ -32,6 +32,7 @@ message = """
                 // 如果分钟或小时的值小于10，则在其值前加0，比如如果时间是下午3点20分9秒的话，则显示15：20：09   
                 MM=checkTime(MM);
                 dd=checkTime(dd);
+                hh=checkTime(hh);
                 mm=checkTime(mm);   
                 ss=checkTime(ss);    
                 var day; //用于保存星期（getDay()方法得到星期编号）
