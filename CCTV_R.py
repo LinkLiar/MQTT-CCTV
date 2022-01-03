@@ -1,4 +1,4 @@
-#coding:utf-8
+# coding:utf-8
 import paho.mqtt.client as mqtt
 import time
 import sys
@@ -11,7 +11,7 @@ PORT = 1883
 client_id = 'CCTV-R'
 client = mqtt.Client(client_id)
 
-#命名生成的html
+# 命名生成的html
 GEN_HTML = "index.html"
 message = """
 <!DOCTYPE > 
@@ -69,53 +69,57 @@ message = """
 </html> 
 """
 
-def base64_to_image(image_read):
-    imgdata=base64.b64decode(image_read)
-    Image = open('Cam1.jpg','wb')
-    RealTime = time.localtime(time.time()+28800)
-    print(time.strftime("%Y-%m-%d %H:%M:%S",RealTime ))
-    Image.write(imgdata)
-    Image.close() 
 
-    #打开文件，准备写入
-    f = open(GEN_HTML,'w')
-    DayNumber = time.strftime("%w",RealTime)
+def Base64ToImage(imageRec):
+    imgData = base64.b64decode(imageRec)
+    imageHandle = open('Cam1.jpg', 'wb')
+    RealTime = time.localtime(time.time() + 28800)    # 与北京时间的偏移
+    print(time.strftime("%Y-%m-%d %H:%M:%S", RealTime))
+    imageHandle.write(imgData)
+    imageHandle.close()
+
+    # 打开文件，准备写入
+    f = open(GEN_HTML, 'w')
+    DayNumber = time.strftime("%w", RealTime)
     if(DayNumber == '0'):
-        day="星期日" 
+        day = "星期日"
     if(DayNumber == '1'):
-        day="星期一" 
+        day = "星期一"
     if(DayNumber == '2'):
-        day="星期二" 
+        day = "星期二"
     if(DayNumber == '3'):
-        day="星期三" 
+        day = "星期三"
     if(DayNumber == '4'):
-        day="星期四" 
+        day = "星期四"
     if(DayNumber == '5'):
-        day="星期五" 
+        day = "星期五"
     if(DayNumber == '6'):
-        day="星期六" 
-    text = time.strftime("%Y-%m-%d %H:%M:%S",RealTime) + ' ' +day
+        day = "星期六"
+    text = time.strftime("%Y-%m-%d %H:%M:%S", RealTime) + ' ' + day
 
-    #写入文件
-    f.write(message%text) 
-    #关闭文件
-    f.close()
-    webbrowser.open(GEN_HTML,new = 1) 
 
-def on_message_come_cmd(client, userdata, msg):
-    base64_to_image(msg.payload.decode("UTF-8"))
+    f.write(message % text)    # 写入文件
+    f.close()    # 关闭文件
+    webbrowser.open(GEN_HTML, new=1)
+
+
+def OnMessageComeCmd(client, userdata, msg):
+    Base64ToImage(msg.payload.decode("UTF-8"))
     print("RECEIVE Successfully")
 
-def on_connect(client, userdata, flags, rc):
+
+def OnConnect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
 
+
 def client_connect():
-    client.username_pw_set("CCTV_R","8qADTw1m6ilcHg0pVSmh")
-    client.on_connect = on_connect
+    client.username_pw_set("CCTV_R", "8qADTw1m6ilcHg0pVSmh")
+    client.on_connect = OnConnect
     client.connect(HOST, PORT, 60)
     client.loop_start()
     client.subscribe("Cam1", 1)
-    client.on_message = on_message_come_cmd
+    client.on_message = OnMessageComeCmd
+
 
 if __name__ == '__main__':
     client_connect()
